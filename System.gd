@@ -133,13 +133,22 @@ func _on_message_create(bot: DiscordBot, message: Message, channel: Dictionary):
 		bot.send(message, {"embeds": [botembed]})
 	
 	elif content.begins_with("help"):
-		if content.begins_with("help config"):
-			var botembed = Embed.new()
-			botembed.title = "QUOTE COUNTER HELP"
-			botembed.color = botcolor
-			botembed.add_field("q!export", "Usage: Export the json file of the quotes.\nExample:q!export", true)
-			botembed.add_field("q!clear", "Usage: Clear the quotes list.\nExample:q!clear", true)
-			botembed.add_field("q!assignadmin", "Usage: Assign a role to quote admin.\nExample:q!assign @role", true)
+		content = content.trim_prefix("help").strip_edges()
+		print(content)
+		if content.begins_with("config"):
+			load_file("user://config" + server + ".json")
+			var config = quotedata
+			if config.empty(): return
+			if message.member.roles.has(config[0].values()[0]):
+				var botembed = Embed.new()
+				botembed.title = "QUOTE COUNTER HELP"
+				botembed.color = botcolor
+				botembed.add_field("q!export", "Usage: Export the json file of the quotes.\nExample:q!export", true)
+				botembed.add_field("q!clear", "Usage: Clear the quotes list.\nExample:q!clear", true)
+				botembed.add_field("q!admin", "Usage: Assign a role to quote admin(Can only be used by server owner).\nExample:q!assignadmin @role", true)
+				
+				bot.send(message, {"embeds": [botembed]})
+			else: print("bad")
 		else:
 			var botembed = Embed.new()
 			botembed.title = "QUOTE COUNTER HELP"
@@ -151,7 +160,7 @@ func _on_message_create(bot: DiscordBot, message: Message, channel: Dictionary):
 			botembed.add_field("q!countname", "Usage: Sort all quotes in the database by author.\nExample: q!countbyname", true)
 			botembed.add_field("q!countsubmit(TBD)", "Usage: Sort all quotes in the database by submitter.\nExample: q!countbyname", true)
 			botembed.add_field("q!ping", "Usage: Ping the bot.\nExample: q!ping", true)
-			botembed.add_field("q!config(TBD)", "Usage: Bring up the configuartion help page(admin only).\nExample: q!config", true)
+			botembed.add_field("q!help config", "Usage: Bring up the configuartion help page(admin only).\nExample: q!config", true)
 			
 			
 			bot.send(message, {"embeds": [botembed]})
@@ -160,22 +169,27 @@ func _on_message_create(bot: DiscordBot, message: Message, channel: Dictionary):
 		bot.send(message, "pong")
 	
 	elif content.begins_with("export"):
-		var file = File.new()
-		file.open("user://" + server + ".json", File.READ)
-		
-		
-		var file_data: PoolByteArray = file.get_buffer(file.get_len())
-		file.close()
-		
-		
-		var sendfile = {
-			"data": file_data,
-			"name": "server.json",
-			"media_type": "application/json"
-		}
-		
-		
-		bot.send(message, {"files": [sendfile]})
+		load_file("user://config" + server + ".json")
+		var config = quotedata
+		if config.empty(): return
+		if message.member.roles.has(config[0].values()[0]):
+			
+			var file = File.new()
+			file.open("user://" + server + ".json", File.READ)
+			
+			
+			var file_data: PoolByteArray = file.get_buffer(file.get_len())
+			file.close()
+			
+			
+			var sendfile = {
+				"data": file_data,
+				"name": "server.json",
+				"media_type": "application/json"
+			}
+			
+			
+			bot.send(message, {"files": [sendfile]})
 	
 	elif content.begins_with("edit"):
 		load_file("user://" + server + ".json")
@@ -222,8 +236,35 @@ func _on_message_create(bot: DiscordBot, message: Message, channel: Dictionary):
 			
 			save_file("user://" + server + ".json")
 	
+	elif content.begins_with("admin"):
+		var guild = bot.guilds[channel.guild_id]
+		if guild.owner_id == sender:
+			load_file("user://config" + server + ".json")
+			var config = quotedata
+			
+			print("Received message: " + content)
+			var sent = message.mention_roles
+			if sent.size() == 1:
+				sent = sent[0]
+				
+				#print(sent)
+				
+				
+				var datatoadd = {"AdminRole": sent}
+				config.remove(0)
+				config.insert(0,datatoadd)# = datatoadd
+				
+				quotedata = config
+				save_file("user://config" + server + ".json")
+				bot.send(message, "New Admin Role Accepted")
+			else:
+				pass
+		else:
+			bot.send(message, "You need to be the server owner to accses this command")
 	
-
+	elif content.begins_with("clear"):
+		quotedata = empty
+		save_file("user://" + server + ".json")
 
 func load_file(path):
 	var file = File.new()
