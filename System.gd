@@ -13,7 +13,7 @@ func _ready():
 	add_child(bot)
 	bot.connect("bot_ready", self, "_on_bot_ready")
 	bot.connect("message_create", self, "_on_message_create")
-	bot.TOKEN = "OTQ2OTUzMjk3OTQyNjg3ODM1.YhmM-w.24QmfBFrLfI72CFME4x6BQklUqQ" #"your_bot_token_here"
+	bot.TOKEN = "your_bot_token_here"
 	#bot.VERBOSE = true
 	bot.login()
 
