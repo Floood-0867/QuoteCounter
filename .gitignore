@@ -18,3 +18,7 @@ mono_crash.*.json
 
 *.exe
 /*.import
+
+*.x86_64
+*.pck
+token.TXT

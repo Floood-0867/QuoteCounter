@@ -68,6 +68,8 @@ func _on_message_create(bot: DiscordBot, message: Message, channel: Dictionary):
 			
 			
 			save_file("user://" + server + ".json")
+			
+			bot.delete(message)
 		
 	elif content.begins_with("count") && content.ends_with("count") :
 		load_file("user://" + server + ".json")
