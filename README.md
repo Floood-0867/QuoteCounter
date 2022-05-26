@@ -19,7 +19,7 @@ A discord bot that does all your quote related needs
 ## Regular Command List
 - q!quote - Adds quotes to the database - Example: q!quote "example quote" - example author
 - q!help - Brings up the help menu - Example: q!help
-- q!edit - Edit a quote already in the database(Can only be used by the quotes subbmitter)(TBD) Example: q!edit 1 "edited example quote" - edited example author
+- q!edit - Edit a quote already in the database(Can only be used by the quotes subbmitter) - Example: q!edit 1 "edited example quote" - edited example author
 - q!count - Counts all quotes in the database - Example: q!count
 - q!countname - Sort all the quotes in the database by author(TBD) - Example: qcountbyname! OR q!countname
 - q!ping - Pings the bot - Example: q!ping
